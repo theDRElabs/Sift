@@ -1,0 +1,6 @@
+{
+  "name": "Sift",
+  "description": "A personal capture tool for ideas, info, and to-dos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
