@@ -258,7 +258,7 @@ fun ItemCard(
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
+                LinkifyText(
                     text = item.content,
                     style = MaterialTheme.typography.bodyLarge.copy(
                         textDecoration = if (item.isDone) TextDecoration.LineThrough else TextDecoration.None
