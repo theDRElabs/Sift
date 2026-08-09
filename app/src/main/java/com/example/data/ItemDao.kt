@@ -12,6 +12,9 @@ interface ItemDao {
     @Query("SELECT * FROM items ORDER BY createdAt DESC")
     fun getAllItems(): Flow<List<Item>>
     
+    @Query("SELECT * FROM items ORDER BY createdAt DESC")
+    suspend fun getAllItemsSync(): List<Item>
+    
     @Query("SELECT * FROM items WHERE type = :type ORDER BY createdAt DESC")
     fun getItemsByType(type: ItemType): Flow<List<Item>>
 

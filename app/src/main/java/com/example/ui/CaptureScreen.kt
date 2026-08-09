@@ -163,11 +163,31 @@ fun CaptureScreen(
                 )
                 
                 if (item.type == ItemType.TODO && dueAt != null) {
-                    Text(
-                        text = "Due: " + SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()).format(Date(dueAt!!)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (dueAt!! < System.currentTimeMillis() && !isDone) MaterialTheme.colorScheme.error else OnSurfaceVariantDark
-                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    val isOverdue = dueAt!! < System.currentTimeMillis() && !isDone
+                    if (isOverdue) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(MaterialTheme.colorScheme.error)
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "OVERDUE",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 1.sp
+                                ),
+                                color = MaterialTheme.colorScheme.onError
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = "Due: " + SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()).format(Date(dueAt!!)),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = OnSurfaceVariantDark
+                        )
+                    }
                 }
                 
                 Spacer(modifier = Modifier.height(24.dp))

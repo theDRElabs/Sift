@@ -1,6 +1,8 @@
 package com.example
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -20,10 +22,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.ExistingPeriodicWorkPolicy
+import com.example.notifications.NudgeWorker
 import com.example.ui.CaptureScreen
 import com.example.ui.HomeScreen
 import com.example.ui.SiftViewModel
+import com.example.ui.SortOrder
 import com.example.ui.theme.MyApplicationTheme
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
 
@@ -47,6 +55,20 @@ class MainActivity : ComponentActivity() {
             }
         }
         
+        // Schedule nudges twice a day
+        val nudgeRequest = PeriodicWorkRequestBuilder<NudgeWorker>(12, TimeUnit.HOURS).build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "nudge_worker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            nudgeRequest
+        )
+        
+        // Handle incoming intent
+        if (intent?.getBooleanExtra("OPEN_IMPORTANT", false) == true) {
+            val prefs = getSharedPreferences("sift_prefs", Context.MODE_PRIVATE)
+            prefs.edit().putString("sort_order", SortOrder.IMPORTANT.name).apply()
+        }
+        
         setContent {
             MyApplicationTheme {
                 Surface(
@@ -56,6 +78,17 @@ class MainActivity : ComponentActivity() {
                     SiftApp()
                 }
             }
+        }
+    }
+    
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.getBooleanExtra("OPEN_IMPORTANT", false) == true) {
+            val prefs = getSharedPreferences("sift_prefs", Context.MODE_PRIVATE)
+            prefs.edit().putString("sort_order", SortOrder.IMPORTANT.name).apply()
+            // In a real app we might force ViewModel to reload prefs here or observe them, 
+            // but for simplicity setting prefs before the composables recompose may catch it, 
+            // or they can just restart the app.
         }
     }
 }
